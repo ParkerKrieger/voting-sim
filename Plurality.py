@@ -43,10 +43,10 @@ class Plurality(object):
         for i in range(self.simulation.voters):
             if self.simulation.rankings[i][0] == 1:
                 for j in range(self.simulation.voters):
-                    self.simulation.confidenceScores[j][i] = max((self.simulation.confidenceScores[j][i]*(1+adjust)), 1)
+                    self.simulation.confidenceScores[j][i] = min((self.simulation.confidenceScores[j][i]*(1+adjust)), 1)
             else:
                 for j in range(self.simulation.voters):
-                    self.simulation.confidenceScores[j][i] = min((self.simulation.confidenceScores[j][i]*(1-adjust)), 0)
+                    self.simulation.confidenceScores[j][i] = max((self.simulation.confidenceScores[j][i]*(1-adjust)), 0)
 
 if __name__ == '__main__':
     data = [0] * 4
