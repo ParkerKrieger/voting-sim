@@ -21,17 +21,20 @@ class Ranked(object):
         ranked.simulation = simulation
         return ranked
 
-    def calculate_winner(self):
+    def calculateWinner(self):
         eliminated = []
+        numVotes = self.simulation.calculateVotes()
         # count first place rankings
         for i in range(self.simulation.candidates - 1):
             votes = [0 for i in range(self.simulation.candidates)]
             for elim in eliminated:
                 votes[elim - 1] = math.inf
             for j in range(len(self.simulation.rankings)):
-                ans = self.simulation.rankings[j][0]
-                if ans not in eliminated:
-                    votes[ans - 1] += 1
+                total = numVotes[j]
+                if total > 0:
+                    ans = self.simulation.rankings[j][0]
+                    if ans not in eliminated:
+                        votes[ans - 1] += total
 
             # check for ties/find the winner
             last = []
@@ -48,11 +51,11 @@ class Ranked(object):
 
         winner = [elem for elem in self.simulation.rankings[0] if elem not in eliminated]
         winner = winner[0]
-        return winner
+        return winner - 1
 
     def tieBreaker(self, last, order, candidates, lastIndex):
         if lastIndex < 1:
-            return None
+            return last[0]
 
         # find the last place people
         votes = [0 for i in range(candidates)]
@@ -106,7 +109,7 @@ if __name__ == '__main__':
     for i in range(500):
         ranked = Ranked(voters=100,
                               candidates=4,
-                              iterations=10,
+                              iterations=3,
                               accMean=0.25,
                               accDev=0.01,
                               confMean=0.5,
@@ -119,17 +122,14 @@ if __name__ == '__main__':
     print("-------Sim 3----------")
     data = [0] * 4
     for i in range(500):
-        ranked = Ranked(voters=5,
+        ranked = Ranked(voters=100,
                               candidates=4,
-                              iterations=50,
+                              iterations=5,
                               accMean=0.25,
                               accDev=0.01,
                               confMean=0.5,
                               confDev=0.2)
-        print(i)
         winner = ranked.runSim(0.1)
-        print(f"Winner: {winner}")
-        print(f"Data: {data}")
         data[winner] += 1
     print(winner)
     print(data)
