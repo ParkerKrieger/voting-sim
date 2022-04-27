@@ -20,7 +20,7 @@ class Plurality(object):
         return plurality
 
     def calculateWinner(self):
-        self.votes = self.calculateVotes()
+        self.votes = self.simulation.calculateVotes()
         self.candidateVotes = np.zeros(self.simulation.candidates)
 
         for i in range(self.simulation.voters):
@@ -36,33 +36,12 @@ class Plurality(object):
 
         return self.calculateWinner()
 
-    def calculateVotes(self):
-        votes = np.zeros(self.simulation.voters)
-        voteGiven = True
-        iterations = 0
-
-        for i in range(self.simulation.voters):
-            giveVote = self.simulation.confidenceScores[i].argmax()
-            votes[giveVote] += 1
-
-        while voteGiven and iterations < 10:
-            voteGiven = False
-            for i in range(self.simulation.voters):
-                giveVote = self.simulation.confidenceScores[i].argmax()
-                if giveVote != i:
-                    voteGiven = True
-                    votes[giveVote] += votes[i]
-                    votes[i] = 0
-            iterations += 1
-
-        return votes
-
 if __name__ == '__main__':
     data = [0] * 4
     for i in range(50):
         plurality = Plurality(voters=100,
                               candidates=4,
-                              iterations=25,
+                              iterations=5,
                               accMean=0.25,
                               accDev=0.1,
                               confMean=0.5,
@@ -74,9 +53,9 @@ if __name__ == '__main__':
 
     data = [0] * 4
     for i in range(50):
-        plurality = Plurality(voters=5000,
+        plurality = Plurality(voters=250,
                               candidates=4,
-                              iterations=25,
+                              iterations=5,
                               accMean=0.25,
                               accDev=0.1,
                               confMean=0.5,
@@ -87,10 +66,10 @@ if __name__ == '__main__':
     print(data)
 
     data = [0] * 4
-    for i in range(500):
-        plurality = Plurality(voters=25000,
+    for i in range(50):
+        plurality = Plurality(voters=500,
                               candidates=4,
-                              iterations=25,
+                              iterations=5,
                               accMean=0.25,
                               accDev=0.1,
                               confMean=0.5,

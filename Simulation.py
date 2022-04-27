@@ -9,12 +9,21 @@ class Simulation(object):
     involved in the simulation.
     """
 
-    def __init__(self, voters=20, candidates=4, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2):
+    def __init__(self, voters=20, candidates=4, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2, connections=0.25):
         self.voters = voters
         self.candidates = candidates
         self.accuracyScores = np.random.normal(accMean, accDev, voters)
-        self.confidenceScores = np.random.normal(confMean, confDev, (voters, voters))
+        self.confidenceScores = self.createConfidenceScores(confMean, confDev, connections)
         self.rankings = self.createRankings()
+
+    def createConfidenceScores(self, confMean, confDev, connections):
+        confidenceScores = np.zeros((self.voters, self.voters))
+        for i in range(self.voters):
+            for j in range(self.voters):
+                if random.random() < connections:
+                    confidenceScores[i][j] = np.random.normal(confMean, confDev)
+
+        return confidenceScores
 
     def createRankings(self):
         rankings = []
@@ -32,7 +41,26 @@ class Simulation(object):
         for i in range(self.voters):
             if self.rankings[i][0] == 1:
                 for j in range(self.voters):
-                    self.confidenceScores[j][i] = min((self.confidenceScores[j][i]*(1+adjust)), 1)
+                    if self.confidenceScores[j][i] is not None:
+                        self.confidenceScores[j][i] = min((self.confidenceScores[j][i]*(1+adjust)), 1)
             else:
                 for j in range(self.voters):
-                    self.confidenceScores[j][i] = max((self.confidenceScores[j][i]*(1-adjust)), 0)
+                    if self.confidenceScores[j][i] is not None:
+                        self.confidenceScores[j][i] = max((self.confidenceScores[j][i]*(1-adjust)), 0)
+
+    def calculateVotes(self):
+        votes = np.ones(self.voters, dtype=int)
+        voteGiven = True
+        iterations = 0
+
+        while voteGiven and iterations < 10:
+            voteGiven = False
+            for i in range(self.voters):
+                giveVote = self.confidenceScores[i].argmax()
+                if giveVote != i and giveVote is not None:
+                    voteGiven = True
+                    votes[giveVote] += votes[i]
+                    votes[i] = 0
+            iterations += 1
+
+        return votes

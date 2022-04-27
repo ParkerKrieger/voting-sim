@@ -9,7 +9,6 @@ class Veto(object):
 
     def __init__(self, voters=20, candidates=4, iterations=50, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2):
         self.simulation = Simulation(voters, candidates, accMean, accDev, confMean, confDev)
-        self.votes = None
         self.candidateVotes = None
         self.iterations = iterations
 
@@ -21,14 +20,14 @@ class Veto(object):
 
     def calculateWinner(self):
         rankings = self.simulation.rankings.copy()
-        self.votes = self.calculateVotes()
+        votes = self.simulation.calculateVotes()
         self.candidateVotes = np.zeros(self.simulation.candidates)
         for _ in range(self.simulation.candidates - 1):
             self.candidateVotes = np.zeros(self.simulation.candidates)
 
-            for i in range(len(self.votes)):
+            for i in range(len(votes)):
                 lastPlace = rankings[i].argmax()
-                self.candidateVotes[lastPlace] += self.votes[i]
+                self.candidateVotes[lastPlace] += votes[i]
 
             loser = self.candidateVotes.argmax()
 
@@ -47,66 +46,45 @@ class Veto(object):
 
         return self.calculateWinner()
 
-    def calculateVotes(self):
-        votes = np.zeros(self.simulation.voters)
-        voteGiven = True
-        iterations = 0
-
-        for i in range(self.simulation.voters):
-            giveVote = self.simulation.confidenceScores[i].argmax()
-            votes[giveVote] += 1
-
-        while voteGiven and iterations < 10:
-            voteGiven = False
-            for i in range(self.simulation.voters):
-                giveVote = self.simulation.confidenceScores[i].argmax()
-                if giveVote != i:
-                    voteGiven = True
-                    votes[giveVote] += votes[i]
-                    votes[i] = 0
-            iterations += 1
-
-        return votes
-
 if __name__ == '__main__':
     data = [0] * 4
     for i in range(50):
-        plurality = Veto(voters=100,
+        veto = Veto(voters=100,
                               candidates=4,
-                              iterations=25,
+                              iterations=5,
                               accMean=0.25,
                               accDev=0.1,
                               confMean=0.5,
                               confDev=0.2)
-        winner = plurality.runSim(0.05)
+        winner = veto.runSim(0.05)
         data[winner] += 1
     print(winner)
     print(data)
 
     data = [0] * 4
     for i in range(50):
-        plurality = Veto(voters=5000,
+        veto = Veto(voters=500,
                               candidates=4,
-                              iterations=25,
+                              iterations=5,
                               accMean=0.25,
                               accDev=0.1,
                               confMean=0.5,
                               confDev=0.2)
-        winner = plurality.runSim(0.05)
+        winner = veto.runSim(0.05)
         data[winner] += 1
     print(winner)
     print(data)
 
     data = [0] * 4
-    for i in range(500):
-        plurality = Veto(voters=25000,
+    for i in range(50):
+        veto = Veto(voters=1000,
                               candidates=4,
-                              iterations=25,
+                              iterations=5,
                               accMean=0.25,
                               accDev=0.1,
                               confMean=0.5,
                               confDev=0.2)
-        winner = plurality.runSim(0.05)
+        winner = veto.runSim(0.05)
         data[winner] += 1
     print(winner)
     print(data)
