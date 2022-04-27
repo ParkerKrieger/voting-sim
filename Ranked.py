@@ -9,11 +9,12 @@ class Ranked(object):
     Contains all the logic needed to simulate a ranked election using liquid democracy.
     """
 
-    def __init__(self, voters=20, candidates=4, iterations=50, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2):
+    def __init__(self, voters=20, candidates=4, iterations=50, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2, liquid= True):
         self.simulation = Simulation(voters, candidates, accMean, accDev, confMean, confDev)
         self.votes = np.zeros(voters)
         self.candidateVotes = np.zeros(candidates)
         self.iterations = iterations
+        self.liquid = liquid
 
     @classmethod
     def from_sim(cls, simulation):
@@ -23,7 +24,10 @@ class Ranked(object):
 
     def calculateWinner(self):
         eliminated = []
-        numVotes = self.simulation.calculateVotes()
+        if self.liquid:
+            numVotes = self.simulation.calculateVotes()
+        else:
+            numVotes = [1] * self.simulation.voters
         # count first place rankings
         for i in range(self.simulation.candidates - 1):
             votes = [0 for i in range(self.simulation.candidates)]

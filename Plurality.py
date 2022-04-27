@@ -7,11 +7,12 @@ class Plurality(object):
     Contains all the logic needed to simulate a plurality election using liquid democracy.
     """
 
-    def __init__(self, voters=20, candidates=4, iterations=50, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2):
+    def __init__(self, voters=20, candidates=4, iterations=50, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2, liquid=True):
         self.simulation = Simulation(voters, candidates, accMean, accDev, confMean, confDev)
         self.votes = None
         self.candidateVotes = None
         self.iterations = iterations
+        self.liquid = liquid
 
     @classmethod
     def fromSim(cls, simulation):
@@ -20,7 +21,10 @@ class Plurality(object):
         return plurality
 
     def calculateWinner(self):
-        self.votes = self.simulation.calculateVotes()
+        if self.liquid:
+            self.votes = self.simulation.calculateVotes()
+        else:
+            self.votes = [1] * self.simulation.voters
         self.candidateVotes = np.zeros(self.simulation.candidates)
 
         for i in range(self.simulation.voters):
