@@ -29,7 +29,7 @@ class Veto(object):
                 numVotes = votes[i]
                 if numVotes != 0:
                     lastPlace = rankings[i].argmax()
-                    self.candidateVotes[lastPlace] += votes[i]
+                    self.candidateVotes[lastPlace] += numVotes
 
             loser = self.candidateVotes.argmax()
 
