@@ -24,7 +24,9 @@ class Plurality(object):
         self.candidateVotes = np.zeros(self.simulation.candidates)
 
         for i in range(self.simulation.voters):
-            self.candidateVotes[self.simulation.rankings[i].argmin()] += self.votes[i]
+            numVotes = self.votes[i]
+            if numVotes != 0:
+                self.candidateVotes[self.simulation.rankings[i].argmin()] += self.votes[i]
 
         return self.candidateVotes.argmax()
 

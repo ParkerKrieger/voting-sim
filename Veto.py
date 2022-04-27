@@ -26,8 +26,10 @@ class Veto(object):
             self.candidateVotes = np.zeros(self.simulation.candidates)
 
             for i in range(len(votes)):
-                lastPlace = rankings[i].argmax()
-                self.candidateVotes[lastPlace] += votes[i]
+                numVotes = votes[i]
+                if numVotes != 0:
+                    lastPlace = rankings[i].argmax()
+                    self.candidateVotes[lastPlace] += votes[i]
 
             loser = self.candidateVotes.argmax()
 
