@@ -2,9 +2,9 @@ from Simulation import Simulation
 import numpy as np
 
 
-class Plurality(object):
+class Veto(object):
     """
-    Contains all the logic needed to simulate a plurality election using liquid democracy.
+    Contains all the logic needed to simulate a veto election using liquid democracy.
     """
 
     def __init__(self, voters=20, candidates=4, iterations=50, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2):
@@ -15,18 +15,29 @@ class Plurality(object):
 
     @classmethod
     def fromSim(cls, simulation):
-        plurality = cls(simulation.voters, simulation.candidates)
-        plurality.simulation = simulation
-        return plurality
+        veto = cls(simulation.voters, simulation.candidates)
+        veto.simulation = simulation
+        return veto
 
     def calculateWinner(self):
+        rankings = self.simulation.rankings.copy()
         self.votes = self.calculateVotes()
         self.candidateVotes = np.zeros(self.simulation.candidates)
+        for _ in range(self.simulation.candidates - 1):
+            self.candidateVotes = np.zeros(self.simulation.candidates)
 
-        for i in range(self.simulation.voters):
-            self.candidateVotes[self.simulation.rankings[i].argmin()] += self.votes[i]
+            for i in range(len(self.votes)):
+                lastPlace = rankings[i].argmax()
+                self.candidateVotes[lastPlace] += self.votes[i]
 
-        return self.candidateVotes.argmax()
+            loser = self.candidateVotes.argmax()
+
+            for rank in rankings:
+                rank[loser] = 0
+
+        return rankings[0].argmax()
+
+
 
     def runSim(self, adjust=0.05):
         for i in range(self.iterations - 1):
@@ -60,7 +71,7 @@ class Plurality(object):
 if __name__ == '__main__':
     data = [0] * 4
     for i in range(50):
-        plurality = Plurality(voters=100,
+        plurality = Veto(voters=100,
                               candidates=4,
                               iterations=25,
                               accMean=0.25,
@@ -74,7 +85,7 @@ if __name__ == '__main__':
 
     data = [0] * 4
     for i in range(50):
-        plurality = Plurality(voters=5000,
+        plurality = Veto(voters=5000,
                               candidates=4,
                               iterations=25,
                               accMean=0.25,
@@ -88,7 +99,7 @@ if __name__ == '__main__':
 
     data = [0] * 4
     for i in range(500):
-        plurality = Plurality(voters=25000,
+        plurality = Veto(voters=25000,
                               candidates=4,
                               iterations=25,
                               accMean=0.25,

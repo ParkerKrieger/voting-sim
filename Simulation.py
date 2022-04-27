@@ -27,3 +27,12 @@ class Simulation(object):
             rankings.append(np.array(rankList))
 
         return np.array(rankings)
+
+    def adjustConfidence(self, adjust=0.05):
+        for i in range(self.voters):
+            if self.rankings[i][0] == 1:
+                for j in range(self.voters):
+                    self.confidenceScores[j][i] = min((self.confidenceScores[j][i]*(1+adjust)), 1)
+            else:
+                for j in range(self.voters):
+                    self.confidenceScores[j][i] = max((self.confidenceScores[j][i]*(1-adjust)), 0)
