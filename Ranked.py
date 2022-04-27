@@ -48,7 +48,7 @@ class Ranked(object):
 
         winner = [elem for elem in self.simulation.rankings[0] if elem not in eliminated]
         winner = winner[0]
-        return winner;
+        return winner
 
     def tieBreaker(self, last, order, candidates, lastIndex):
         if lastIndex < 1:
@@ -79,22 +79,14 @@ class Ranked(object):
 
     def runSim(self, adjust=0.05):
         for i in range(self.iterations - 1):
-            self.calculate_winner()
-            self.adjustConfidence(adjust)
+            self.calculateWinner()
+            self.simulation.adjustConfidence(adjust)
             self.simulation.createRankings()
 
-        return self.calculate_winner()
-
-    def adjustConfidence(self, adjust=0.05):
-        for i in range(self.simulation.voters):
-            if self.simulation.rankings[i][0] == 1:
-                for j in range(self.simulation.voters):
-                    self.simulation.confidenceScores[j][i] = min((self.simulation.confidenceScores[j][i]*(1+adjust)), 1)
-            else:
-                for j in range(self.simulation.voters):
-                    self.simulation.confidenceScores[j][i] = max((self.simulation.confidenceScores[j][i]*(1-adjust)), 0)
+        return self.calculateWinner()
 
 if __name__ == '__main__':
+    print("-------Sim 1----------")
     data = [0] * 4
     for i in range(500):
         ranked = Ranked(voters=100,
@@ -104,14 +96,12 @@ if __name__ == '__main__':
                               accDev=0.01,
                               confMean=0.5,
                               confDev=0.2)
-
-        print(f"Candidates: {ranked.simulation.candidates}")
-        print(f"Rankings: {ranked.simulation.rankings}")
         winner = ranked.runSim(0.1)
         data[winner] += 1
     print(winner)
     print(data)
 
+    print("-------Sim 2----------")
     data = [0] * 4
     for i in range(500):
         ranked = Ranked(voters=100,
@@ -126,6 +116,7 @@ if __name__ == '__main__':
     print(winner)
     print(data)
 
+    print("-------Sim 3----------")
     data = [0] * 4
     for i in range(500):
         ranked = Ranked(voters=5,
@@ -135,7 +126,10 @@ if __name__ == '__main__':
                               accDev=0.01,
                               confMean=0.5,
                               confDev=0.2)
+        print(i)
         winner = ranked.runSim(0.1)
+        print(f"Winner: {winner}")
+        print(f"Data: {data}")
         data[winner] += 1
     print(winner)
     print(data)
