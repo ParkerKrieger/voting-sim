@@ -20,7 +20,7 @@ class Simulation(object):
         confidenceScores = np.zeros((self.voters, self.voters))
         for i in range(self.voters):
             for j in range(self.voters):
-                if random.random() < connections:
+                if random.random() < connections or i == j:
                     confidenceScores[i][j] = np.random.normal(confMean, confDev)
 
         return confidenceScores
