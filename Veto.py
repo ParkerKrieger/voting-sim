@@ -7,10 +7,11 @@ class Veto(object):
     Contains all the logic needed to simulate a veto election using liquid democracy.
     """
 
-    def __init__(self, voters=20, candidates=4, iterations=50, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2):
+    def __init__(self, voters=20, candidates=4, iterations=50, accMean=0.5, accDev=0.1, confMean=0.5, confDev=0.2, liquid=True):
         self.simulation = Simulation(voters, candidates, accMean, accDev, confMean, confDev)
         self.candidateVotes = None
         self.iterations = iterations
+        self.liquid = liquid
 
     @classmethod
     def fromSim(cls, simulation):
@@ -20,7 +21,10 @@ class Veto(object):
 
     def calculateWinner(self):
         rankings = self.simulation.rankings.copy()
-        votes = self.simulation.calculateVotes()
+        if self.liquid:
+            votes = self.simulation.calculateVotes()
+        else:
+            votes = [1] * self.simulation.voters
         self.candidateVotes = np.zeros(self.simulation.candidates)
         for _ in range(self.simulation.candidates - 1):
             self.candidateVotes = np.zeros(self.simulation.candidates)
